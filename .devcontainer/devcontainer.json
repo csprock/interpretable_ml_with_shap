@@ -35,7 +35,12 @@
 				"ms-python.python",
 				"ms-python.vscode-pylance",
 				"ms-toolsai.jupyter",
-				"ms-toolsai.datawrangler"
+				"ms-toolsai.datawrangler",
+				"github.copilot",
+				"github.copilot-chat",
+				"njpwerner.autodocstring",
+				"ms-toolsai.datawrangler",
+				"vscode.git"
 			]
 		}
 	},
