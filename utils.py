@@ -3,6 +3,11 @@ import numpy as np
 import pandas as pd
 import folium
 
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.model_selection import RandomizedSearchCV
+from sklearn.model_selection import KFold
+from sklearn.metrics import mean_squared_error
+
 
 
 def plot_linear_prediction_waterfall(index, linear_components, model, X_test_selected):
@@ -41,7 +46,7 @@ def plot_linear_prediction_waterfall(index, linear_components, model, X_test_sel
     values = [intercept] + sorted_contributions.values.tolist()
     
     # Create figure
-    fig, ax = plt.subplots(figsize=(12, 8))
+    fig, ax = plt.subplots(figsize=(8, 6))
     
     # Starting point (intercept)
     cumulative = values[0]
@@ -153,7 +158,7 @@ def plot_permuted_correlated_features():
     plt.xlabel('Feature 1')
     plt.ylabel('Feature 2')
     plt.title('Demonstration of Permutation Method Issues with Correlated Features\n'
-            f'Original Correlation: {original_corr:.3f}, After Permutation: {permuted_corr:.3f}')
+            f'Original Correlation: {original_corr:.3f}')
     plt.legend()
     plt.grid(alpha=0.3)
 
@@ -184,3 +189,63 @@ def map_point(lat, lon, price, predicted_price, median_income, house_age, ave_ro
         icon=folium.Icon(color="red")
     ).add_to(m)
     return m
+
+
+
+
+def train_rf_model(X_train, y_train, X_test, y_test):
+
+
+    # Set up hyperparameter search for Random Forest Regressor
+    # Define the parameter grid to search
+    param_dist = {
+        'n_estimators': [50, 100, 150, 200],
+        'max_depth': [10, 20, 30],
+        'min_samples_split': [2, 5, 10],
+        'min_samples_leaf': [1, 2, 4],
+        'max_features': ['sqrt', 'log2'],
+        'bootstrap': [True, False]
+    }
+
+# Create the random forest regressor
+    rf = RandomForestRegressor(random_state=42)
+
+    # Set up k-fold cross-validation
+    cv = KFold(n_splits=5, shuffle=True, random_state=42)
+
+    # Create the RandomizedSearchCV
+    rf_random = RandomizedSearchCV(
+        estimator=rf,
+        param_distributions=param_dist,
+        n_iter=50,  # Number of parameter settings to try
+        scoring='neg_mean_squared_error',
+        cv=cv,
+        verbose=1,
+        random_state=42,
+        n_jobs=-1  # Use all available cores
+    )
+
+    # Fit the random search
+    rf_random.fit(X_train, y_train)
+
+    # Print the best parameters and score
+    print("Best Parameters:", rf_random.best_params_)
+    print("Best CV Score:", -rf_random.best_score_)  # Convert back to positive MSE
+
+    # Save best parameters to JSON file
+
+    best_params = rf_random.best_params_
+
+    print("Best parameters saved to rf_best_params.json")
+
+    # Evaluate on test set
+    best_rf = rf_random.best_estimator_
+    test_score = best_rf.score(X_test, y_test)
+    print(f"R² Score on Test Set: {test_score:.4f}")
+
+    # Calculate MSE on test set
+    y_pred = best_rf.predict(X_test)
+    mse = mean_squared_error(y_test, y_pred)
+    print(f"MSE on Test Set: {mse:.4f}")
+
+    return best_rf, best_params
