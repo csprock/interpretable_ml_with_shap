@@ -53,3 +53,40 @@ This project can be set up quickly using development containers, which provide a
 
 5. Once inside the container, the environment is ready with all necessary dependencies installed.
 
+### Without Docker
+
+#### Prerequisites
+
+- Python 3.8 or higher
+- pip (Python package installer)
+
+#### Setup Steps
+
+1. Clone the repository:
+    ```bash
+    git clone https://github.com/csprock/interpretable_ml_with_shap.git
+    cd interpretable_ml_with_shap
+    ```
+
+2. Create and activate a virtual environment (optional but recommended):
+    ```bash
+    python -m venv venv
+    
+    # On Windows
+    venv\Scripts\activate
+    
+    # On macOS/Linux
+    source venv/bin/activate
+    ```
+
+3. Install the required packages:
+    ```bash
+    pip install -r requirements.txt
+    ```
+
+4. Start Jupyter Notebook:
+    ```bash
+    jupyter notebook
+    ```
+
+5. Open `demo_notebook.ipynb` in your browser to run the presentation notebook.
