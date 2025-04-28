@@ -1,2 +1,2 @@
-pandas-profiling
-folium
+folium==0.19.5
+ydata-profiling==4.15.1
